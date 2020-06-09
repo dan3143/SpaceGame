@@ -3,11 +3,15 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
     Light2D btLight;
+    [SerializeField]
+    TextMeshProUGUI score;
+
     bool isConnected = false;
     public int points = 0;
     
@@ -50,12 +54,11 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (isConnected) {
-            btLight.color = Color.cyan;
-            btLight.enabled = true;
+            btLight.color = Color.blue;
         } else {
             btLight.color = Color.white;
-            btLight.enabled = false;
         }
+        score.text = "x" + points;
     }
 
     void Message(string message)
