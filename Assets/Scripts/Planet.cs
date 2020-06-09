@@ -12,26 +12,36 @@ public class Planet : MonoBehaviour
 
     [SerializeField]
     EventTrigger.TriggerEvent planetClick;
+    bool selected = false;
 
     void Start()
     {
         light2d.enabled = false;
     }
 
+    void Update()
+    {
+        if (selected)
+        {
+            if (Input.GetButtonDown("A")){
+                BaseEventData eventData = new BaseEventData(EventSystem.current);
+                eventData.selectedObject = this.gameObject;
+                planetClick.Invoke(eventData);
+            }
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (Input.GetButtonDown("Submit"))
-        {
-            BaseEventData eventData = new BaseEventData(EventSystem.current);
-            eventData.selectedObject = this.gameObject;
-            planetClick.Invoke(eventData);
-        }   
-        light2d.enabled = true;
+        
+        selected = true;
+        light2d.enabled = selected;
     }
 
     void OnTriggerExit2D(Collider2D col)
     {
-        light2d.enabled = false;        
+        selected = false;
+        light2d.enabled = selected;        
     }
 
 }
