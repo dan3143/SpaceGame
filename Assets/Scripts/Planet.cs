@@ -1,39 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public class Planet : MonoBehaviour
 {
     [SerializeField] 
-    TextMeshProUGUI text;
+    Light2D light2d;
 
     [SerializeField]
     EventTrigger.TriggerEvent planetClick;
 
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        light2d.enabled = false;
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log(col.gameObject + " entered");
-        text.enabled = true;
+        if (Input.GetButtonDown("Submit"))
+        {
+            BaseEventData eventData = new BaseEventData(EventSystem.current);
+            eventData.selectedObject = this.gameObject;
+            planetClick.Invoke(eventData);
+        }   
+        light2d.enabled = true;
     }
 
     void OnTriggerExit2D(Collider2D col)
     {
-        Debug.Log(col.gameObject + " exited");
-        text.enabled = false;
+        light2d.enabled = false;        
     }
 
 }
