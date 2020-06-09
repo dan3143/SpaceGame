@@ -2,27 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class CardGameManager : MonoBehaviour
 {
     const float offsetX = 3f;
     const float offsetY = 3f;
     private int score = 0;
+    private int globalScore;
     private Card[,] cards;
     private int current_x;
     private int current_y;
     private Card firstRevealed;
     private Card secondRevealed;
-    private bool _canReveal = true;
     [SerializeField] int rows = 3;
     [SerializeField] int columns = 4;
     [SerializeField] private Sprite[] images;
     [SerializeField] private Card originalCard;
-    [SerializeField] private TextMeshProUGUI scoreTxt;
     [SerializeField] private GameObject returnMenu;
+    [SerializeField] private TextMeshProUGUI scoreTxt;
+    
 
     void Awake() 
     {
+        globalScore = SaveStatus.Load();
         cards = new Card[rows, columns];
         current_x = 0;
         current_y = 0;
@@ -50,8 +53,11 @@ public class CardGameManager : MonoBehaviour
             score++;
             scoreTxt.text = "SCORE: " + score;
             if (score == images.Length) {
+                globalScore += score;
+                Debug.Log("Points Obtained:" + globalScore);
+                SaveStatus.Save(globalScore);
+                scoreTxt.enabled = false;
                 returnMenu.SetActive(true);
-                
             }
         } else {
             yield return new WaitForSeconds(.5f);
@@ -85,7 +91,6 @@ public class CardGameManager : MonoBehaviour
             }
         }
         cards[current_y, current_x].toggleSelect();
-        showCards();
     }
 
     int [] getIds() 
@@ -153,6 +158,6 @@ public class CardGameManager : MonoBehaviour
 
     public void ReturnToMenu()
     {
-        
+        SceneManager.LoadScene("Space");
     }
 }

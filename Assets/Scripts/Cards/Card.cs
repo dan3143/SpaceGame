@@ -10,7 +10,6 @@ public class Card : MonoBehaviour
     private int _id;
     private bool selected = false;
     private bool isRevealead = false;
-    private SpriteRenderer backSprite;
 
     public int id {
         get { return _id; }
@@ -24,19 +23,16 @@ public class Card : MonoBehaviour
         }
         frontSprite.sprite = image;
     }
-
+    
     void OnMouseDown()
     {
         Reveal();
     }
 
     public void toggleSelect() {
-        /*if (backSprite == null) {
-            backSprite = cardBack.GetComponent<SpriteRenderer>();
-        }*/
         selected = !selected;
         selector.SetActive(selected);
-        //frontSprite.color = backSprite.color;
+        
     }
 
     public void Unreveal()
