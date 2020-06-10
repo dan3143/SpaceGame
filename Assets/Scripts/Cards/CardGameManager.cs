@@ -16,6 +16,7 @@ public class CardGameManager : MonoBehaviour
     private Card firstRevealed;
     private Card secondRevealed;
     private BluetoothService bluetoothService;
+    private bool finished = false;
     [SerializeField] int rows = 3;
     [SerializeField] int columns = 4;
     [SerializeField] private Sprite[] images;
@@ -62,6 +63,7 @@ public class CardGameManager : MonoBehaviour
                 Debug.Log("Points Obtained:" + globalScore);
                 SaveStatus.Save(globalScore);
                 scoreTxt.enabled = false;
+                finished = true;
                 returnMenu.SetActive(true);
             }
         } else {
@@ -147,13 +149,25 @@ public class CardGameManager : MonoBehaviour
             if (Input.GetButtonDown("Right")) Move("right");
             if (Input.GetButtonDown("Down")) Move("down");
             if (Input.GetButtonDown("Up")) Move("up");
-            if (Input.GetButtonDown("A")) Move("a");
+            if (Input.GetButtonDown("A")) {
+                if (finished) {
+                    ReturnToMenu();
+                } else {
+                    Move("a");
+                }
+            }
         } else if (Application.platform == RuntimePlatform.Android) {
             if (bluetoothService.IsButtonClicked("Left")) Move("left");
             if (bluetoothService.IsButtonClicked("Right")) Move("right");
             if (bluetoothService.IsButtonClicked("Down")) Move("down");
             if (bluetoothService.IsButtonClicked("Up")) Move("up");
-            if (bluetoothService.IsButtonClicked("A")) Move("a");
+            if (bluetoothService.IsButtonClicked("A")) {
+                if (finished) {
+                    ReturnToMenu();
+                } else {
+                    Move("a");
+                }
+            }
         }
     }
 

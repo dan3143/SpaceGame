@@ -34,11 +34,18 @@ public class Planet : MonoBehaviour
             }
             
             if (click) {
-                Debug.Log("A click happened");
-                BaseEventData eventData = new BaseEventData(EventSystem.current);
-                eventData.selectedObject = this.gameObject;
-                planetClick.Invoke(eventData);
+                Exec();
             }
+        }
+    }
+
+    void Exec()
+    {
+        if (selected)
+        {
+            BaseEventData eventData = new BaseEventData(EventSystem.current);
+            eventData.selectedObject = this.gameObject;
+            planetClick.Invoke(eventData);
         }
     }
 
@@ -50,8 +57,28 @@ public class Planet : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D col)
     {
-        selected = false;
-        light2d.enabled = selected;        
+        SetSelected(false);
+    }
+
+    void OnMouseEnter()
+    {
+        SetSelected(true);
+    }
+
+    void OnMouseExit()
+    {
+        SetSelected(false);
+    }
+
+    
+    void OnMouseDown()
+    {
+        Exec();
+    }
+
+    void SetSelected(bool selected) {
+        this.selected = selected;
+        this.light2d.enabled = selected;
     }
 
 }
