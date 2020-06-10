@@ -15,6 +15,7 @@ public class CardGameManager : MonoBehaviour
     private int current_y;
     private Card firstRevealed;
     private Card secondRevealed;
+    private BluetoothService bluetoothService;
     [SerializeField] int rows = 3;
     [SerializeField] int columns = 4;
     [SerializeField] private Sprite[] images;
@@ -25,6 +26,10 @@ public class CardGameManager : MonoBehaviour
 
     void Awake() 
     {
+        if (Application.platform == RuntimePlatform.Android) {
+            bluetoothService = BluetoothService.Instance;
+            BluetoothService.Bluetooth.ServerObject = "GameManager";
+        }
         globalScore = SaveStatus.Load();
         cards = new Card[rows, columns];
         current_x = 0;
@@ -117,7 +122,7 @@ public class CardGameManager : MonoBehaviour
         return shuffled;
     }
 
-    void Message(string message)
+    void Move(string message)
     {
         cards[current_y, current_x].toggleSelect();
         if (message == "up" && current_y > 0) {
@@ -138,11 +143,17 @@ public class CardGameManager : MonoBehaviour
 
     void Update() {
         if (Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.WindowsEditor) {
-            if (Input.GetButtonDown("Left")) Message("left");
-            if (Input.GetButtonDown("Right")) Message("right");
-            if (Input.GetButtonDown("Down")) Message("down");
-            if (Input.GetButtonDown("Up")) Message("up");
-            if (Input.GetButtonDown("A")) Message("a");
+            if (Input.GetButtonDown("Left")) Move("left");
+            if (Input.GetButtonDown("Right")) Move("right");
+            if (Input.GetButtonDown("Down")) Move("down");
+            if (Input.GetButtonDown("Up")) Move("up");
+            if (Input.GetButtonDown("A")) Move("a");
+        } else if (Application.platform == RuntimePlatform.Android) {
+            if (bluetoothService.IsButtonClicked("Left")) Move("left");
+            if (bluetoothService.IsButtonClicked("Right")) Move("right");
+            if (bluetoothService.IsButtonClicked("Down")) Move("down");
+            if (bluetoothService.IsButtonClicked("Up")) Move("up");
+            if (bluetoothService.IsButtonClicked("A")) Move("a");
         }
     }
 

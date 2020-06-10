@@ -11,24 +11,41 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float maxMovementSpeed = 10f;
     [SerializeField] float deceleration = 0.5f;
     Rigidbody2D rb2;
+    BluetoothService bluetoothService;
+    bool rotatingRight = false;
+    bool rotatingLeft = false;
+    bool advancing = false;
     
     void Start()
     {
         rb2 = GetComponent<Rigidbody2D>();
+        bluetoothService = BluetoothService.Instance;
+    }
+    
+    void Update()
+    {
+        if (Application.platform == RuntimePlatform.Android) {
+            rotatingLeft = bluetoothService.IsButtonPressed("Left");
+            rotatingRight = bluetoothService.IsButtonPressed("Right");
+            advancing = bluetoothService.IsButtonPressed("Space");
+        } else {
+            rotatingLeft = Input.GetButton("Left");
+            rotatingRight = Input.GetButton("Right");
+            advancing = Input.GetButton("Jump");
+        }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetButton("Left"))
+        if (rotatingLeft)
         {
             transform.Rotate(0, 0, rotationSpeed);
         }
-        if (Input.GetButton("Right"))
+        if (rotatingRight)
         {
             transform.Rotate(0, 0, -rotationSpeed);
         }
-        if (Input.GetButton("Jump"))
+        if (advancing)
         {
             Vector3 movement = transform.up * movementSpeed;
             rb2.AddForce(movement);
@@ -39,5 +56,12 @@ public class PlayerMovement : MonoBehaviour
             fire.SetActive(false);
             rb2.velocity -= rb2.velocity * deceleration;
         }
+    }
+
+    void Message(string message)
+    {
+        rotatingLeft = message == "left_pressed";
+        rotatingRight = message == "right_pressed";
+        advancing = message == "x_pressed";
     }
 }

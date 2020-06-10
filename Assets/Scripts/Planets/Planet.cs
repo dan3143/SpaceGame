@@ -13,17 +13,28 @@ public class Planet : MonoBehaviour
     [SerializeField]
     EventTrigger.TriggerEvent planetClick;
     bool selected = false;
+    BluetoothService bluetoothService;
 
     void Start()
     {
+        if (Application.platform == RuntimePlatform.Android)
+            bluetoothService = GameObject.FindGameObjectWithTag("Bluetooth").GetComponent<BluetoothService>();
         light2d.enabled = false;
     }
 
-    void Update()
+    public void Update()
     {
         if (selected)
         {
-            if (Input.GetButtonDown("A")){
+            bool click = false;
+            if (Application.platform == RuntimePlatform.Android) {
+                click = bluetoothService.IsButtonClicked("A");
+            } else {
+                click = Input.GetButton("A");
+            }
+            
+            if (click) {
+                Debug.Log("A click happened");
                 BaseEventData eventData = new BaseEventData(EventSystem.current);
                 eventData.selectedObject = this.gameObject;
                 planetClick.Invoke(eventData);
@@ -33,7 +44,6 @@ public class Planet : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        
         selected = true;
         light2d.enabled = selected;
     }

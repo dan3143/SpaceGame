@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI scoreTxt;
     int score;
-    bool isConnected = false;
+    BluetoothService btService;
 
     void Awake()
     {
@@ -18,28 +18,30 @@ public class GameManager : MonoBehaviour
     }
 
     void Start()
-    {        
+    {
+        btLight.enabled = false;
         scoreTxt.text = "x" + score;
-        Debug.Log("Score:" + score);
     }
 
     void Update()
     {
-        if (isConnected) {
-            btLight.color = Color.blue;
-        } else {
-            btLight.color = Color.white;
-        }
         scoreTxt.text = "x" + score;
+        if (Application.platform == RuntimePlatform.Android)
+            btLight.enabled = BluetoothService.Bluetooth.IsEnabled;
+        
     }
-
+    
     void Message(string message)
-    {
+    {   
         if (message == "bluetooth.connected") {
-            isConnected = true;
-        } else if (message == "bluetooth.disconnected") {
-            isConnected = false;
+            btLight.color = Color.blue;
         }
+        if (message == "bluetooth.on") {
+            BluetoothService.Bluetooth.Start();
+        } 
+        if (message == "server.listening") {
+            btLight.color = Color.white;
+        } 
     }
 
     public void GoToMemoryPlanet()
@@ -55,4 +57,5 @@ public class GameManager : MonoBehaviour
             Debug.Log("Wait this is not Android");
         }
     }
+
 }
