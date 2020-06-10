@@ -61,7 +61,6 @@ public class BluetoothService : MonoBehaviour
             _instance.bluetooth = new Bluetooth();
             if (_instance.bluetooth.IsEnabled) {
                 _instance.bluetooth.Start();
-                Debug.Log("[BluetoothService]Bluetooth server started");
             }
             _instance.bluetooth.PlayerObject = "BluetoothService";
             DontDestroyOnLoad(this.gameObject);

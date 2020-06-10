@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (Application.platform == RuntimePlatform.Android) {
+            BluetoothService.Bluetooth.ServerObject = "GameManager";
+        }
         btLight.enabled = false;
         scoreTxt.text = "x" + score;
     }
@@ -30,9 +33,10 @@ public class GameManager : MonoBehaviour
             btLight.enabled = BluetoothService.Bluetooth.IsEnabled;
         
     }
-    
+
     void Message(string message)
-    {   
+    {  
+        Debug.Log("Server: " + message); 
         if (message == "bluetooth.connected") {
             btLight.color = Color.blue;
         }
@@ -49,13 +53,10 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("CardGame");
     }
 
-    public void ActivateBluetooth()
+    public void SaveQuit()
     {
-        if (Application.platform == RuntimePlatform.Android) {
-            Debug.Log("Activating Bluetooth");
-        } else {
-            Debug.Log("Wait this is not Android");
-        }
+        SaveStatus.Save(score);
+        Application.Quit();
     }
 
 }

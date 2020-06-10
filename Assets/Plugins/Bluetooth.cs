@@ -25,6 +25,7 @@ public class Bluetooth {
     }
 
     public void Start(){
+        Debug.Log("Starting Bluetooth server...");
         PluginInstance.Call("start");
     }
 
