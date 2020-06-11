@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -20,9 +19,19 @@ public class SequenceGameManager : MonoBehaviour
     private int score = 0;
     private int bonus = 0;
     private int globalScore;
-
+    private BluetoothService bt;
+    private int x, y;
+    private int columns = 2;
+    private int rows = 2;
+    
     void Start()
     {
+        if (Application.platform == RuntimePlatform.Android) {
+            ToggleButton(buttons[0]);
+            bt = BluetoothService.Instance;
+            x = y = 0;
+        }
+        
         globalScore = SaveStatus.Load();
         buttonIds = new int[buttons.Length];
         for (int i = 0; i < buttons.Length; i++) {
@@ -36,14 +45,52 @@ public class SequenceGameManager : MonoBehaviour
 
     void Update()
     {
-        
+        if (Application.platform == RuntimePlatform.Android) {
+            if (bt.IsButtonClicked("Left")) Move("left");
+            if (bt.IsButtonClicked("Right")) Move("right");
+            if (bt.IsButtonClicked("Down")) Move("down");
+            if (bt.IsButtonClicked("Up")) Move("up");
+            
+            if (bt.IsButtonClicked("A")) {
+                if (menu.activeSelf) {
+                    Again();
+                } else {
+                    ButtonPressed(GetIndex(x, y));
+                }
+            }
+
+            if (bt.IsButtonClicked("B")) {
+                if (menu.activeSelf) {
+                    ReturnSpace();
+                } else {
+                    ButtonPressed(GetIndex(x, y));
+                }
+            }
+        }
     }
 
-    void PlayAgain()
+    void Move(string message)
     {
-        currentButton = 0;
-        GenerateSequence();
-        PlaySequence();
+        ToggleButton(GetButton(x, y));
+        if (message == "up" && y > 0) {
+            y -= 1;
+        } else if (message == "down" && y < rows-1) {
+            y += 1;
+        }
+        if (message == "left" && x > 0) {
+            x -= 1;
+        } else if (message == "right" && x < columns-1) {
+            x += 1;
+        }
+        ToggleButton(GetButton(x, y));
+    }
+
+    Button GetButton(int i, int j) {
+        return buttons[j*columns + i];
+    }
+
+    int GetIndex(int i, int j) {
+        return j*columns+i;
     }
 
     void ButtonPressed(int id)
@@ -67,9 +114,11 @@ public class SequenceGameManager : MonoBehaviour
         }
     }
 
-    IEnumerator Wait(int n)
+    void PlayAgain()
     {
-        yield return new WaitForSeconds(n);
+        currentButton = 0;
+        GenerateSequence();
+        PlaySequence();
     }
 
     void GenerateSequence() 
@@ -81,7 +130,7 @@ public class SequenceGameManager : MonoBehaviour
 
     IEnumerator _PlaySequence()
     {
-        ToggleButtons();
+        ToggleButtonsClickable();
         GameObject selector;
         foreach(int button in sequence) {
             selector = buttons[button].transform.GetChild(0).gameObject;
@@ -90,7 +139,7 @@ public class SequenceGameManager : MonoBehaviour
             selector.SetActive(false);
             yield return new WaitForSeconds(delay);
         }
-        ToggleButtons();
+        ToggleButtonsClickable();
     }
 
     void PlaySequence()
@@ -98,10 +147,15 @@ public class SequenceGameManager : MonoBehaviour
         StartCoroutine(_PlaySequence());
     }
 
-    void ToggleButtons() {
+    void ToggleButtonsClickable() {
         foreach(Button btn in buttons) {
             btn.interactable = !btn.interactable;
         }
+    }
+
+    void ToggleButton(Button btn) {
+        GameObject selector = btn.transform.GetChild(1).gameObject;
+        selector.SetActive(!selector.activeSelf);
     }
 
     public void ReturnSpace()

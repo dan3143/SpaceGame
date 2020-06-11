@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -488,7 +488,18 @@ MonoBehaviour:
   light2d: {fileID: 990296114}
   planetClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1298017198}
+        m_MethodName: GoToSequencePlanet
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!212 &919520765
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -547,7 +558,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919520762}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.04, y: -4.39, z: 0}
+  m_LocalPosition: {x: -6.79, y: -3.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 990296115}
@@ -1953,6 +1964,10 @@ MonoBehaviour:
     key_name: space
     pressed_name: space_pressed
     released_name: space_released
+  - name: B
+    key_name: b
+    pressed_name: b_pressed
+    released_name: b_released
 --- !u!1 &2056296451
 GameObject:
   m_ObjectHideFlags: 0

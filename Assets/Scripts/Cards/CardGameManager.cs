@@ -15,7 +15,7 @@ public class CardGameManager : MonoBehaviour
     private int current_y;
     private Card firstRevealed;
     private Card secondRevealed;
-    private BluetoothService bluetoothService;
+    private BluetoothService bt;
     private bool finished = false;
     [SerializeField] int rows = 3;
     [SerializeField] int columns = 4;
@@ -28,7 +28,7 @@ public class CardGameManager : MonoBehaviour
     void Awake() 
     {
         if (Application.platform == RuntimePlatform.Android) {
-            bluetoothService = BluetoothService.Instance;
+            bt = BluetoothService.Instance;
             BluetoothService.Bluetooth.ServerObject = "GameManager";
         }
         globalScore = SaveStatus.Load();
@@ -157,11 +157,11 @@ public class CardGameManager : MonoBehaviour
                 }
             }
         } else if (Application.platform == RuntimePlatform.Android) {
-            if (bluetoothService.IsButtonClicked("Left")) Move("left");
-            if (bluetoothService.IsButtonClicked("Right")) Move("right");
-            if (bluetoothService.IsButtonClicked("Down")) Move("down");
-            if (bluetoothService.IsButtonClicked("Up")) Move("up");
-            if (bluetoothService.IsButtonClicked("A")) {
+            if (bt.IsButtonClicked("Left")) Move("left");
+            if (bt.IsButtonClicked("Right")) Move("right");
+            if (bt.IsButtonClicked("Down")) Move("down");
+            if (bt.IsButtonClicked("Up")) Move("up");
+            if (bt.IsButtonClicked("A")) {
                 if (finished) {
                     ReturnToMenu();
                 } else {

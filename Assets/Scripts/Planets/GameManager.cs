@@ -53,6 +53,11 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("CardGame");
     }
 
+    public void GoToSequencePlanet()
+    {
+        SceneManager.LoadScene("SequenceGame");
+    }
+
     public void SaveQuit()
     {
         SaveStatus.Save(score);
