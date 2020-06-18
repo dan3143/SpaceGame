@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 
-public class BluetoothService : MonoBehaviour
+public class BluetoothControl : MonoBehaviour
 {
     [System.Serializable]
     public class BluetoothButton {
@@ -29,23 +29,24 @@ public class BluetoothService : MonoBehaviour
         }
     }
 
-    private static BluetoothService _instance;
-    private const int RELEASED = 0;
-    private const int PRESSED = 1;
-    private const int CLICKED = 2;
-    private Bluetooth bluetooth;
+    private static BluetoothControl _instance;
+    private const int STATUS_RELEASED = 0;
+    private const int STATUS_PRESSED = 1;
+    private const int STATUS_CLICKED = 2;
+    private BluetoothServer server;
     [SerializeField] private BluetoothButton[] buttons;
-    private static Bluetooth tmpBt;
+    private static BluetoothServer tmpBt;
 
-    public static BluetoothService Instance {
+    public static BluetoothControl Instance {
         get { return _instance; }
     }
 
-    public static Bluetooth Bluetooth {
+    public static BluetoothServer Server {
         get { 
             if (tmpBt == null) {
-                tmpBt = _instance.GetComponent<BluetoothService>().bluetooth;
+                tmpBt = _instance.GetComponent<BluetoothControl>().server;
             }
+            Debug.Log("tmpBt: " + tmpBt);
             return tmpBt;
          }
     }
@@ -58,11 +59,11 @@ public class BluetoothService : MonoBehaviour
             DestroyImmediate(this.gameObject);
         } else {
             _instance = this;
-            _instance.bluetooth = new Bluetooth();
-            if (_instance.bluetooth.IsEnabled) {
-                _instance.bluetooth.Start();
+            _instance.server = new BluetoothServer();
+            if (Bluetooth.IsEnabled) {
+                _instance.server.Start();
             }
-            _instance.bluetooth.PlayerObject = "BluetoothService";
+            _instance.server.PlayerObject = this.gameObject.name;
             DontDestroyOnLoad(this.gameObject);
         }
     }
@@ -74,8 +75,7 @@ public class BluetoothService : MonoBehaviour
 
     private bool GetButtonStatus(string name, int status) 
     {
-        if (!bluetooth.IsEnabled) {
-            Debug.LogError("Bluetooth is off");
+        if (!Bluetooth.IsEnabled) {
             return false;
         }
 
@@ -84,11 +84,11 @@ public class BluetoothService : MonoBehaviour
             if (btn.name == name) {
                 found = true;
                 switch (status) {
-                    case PRESSED:
+                    case STATUS_PRESSED:
                         return btn.IsPressed;
-                    case RELEASED:
+                    case STATUS_RELEASED:
                         return btn.IsReleased;
-                    case CLICKED:
+                    case STATUS_CLICKED:
                         return btn.IsClicked;
                 }
             }
@@ -100,15 +100,15 @@ public class BluetoothService : MonoBehaviour
     }
 
     public bool IsButtonPressed(string btn) {
-        return GetButtonStatus(btn, PRESSED);
+        return GetButtonStatus(btn, STATUS_PRESSED);
     }
 
     public bool IsButtonReleased(string btn) {
-        return GetButtonStatus(btn, RELEASED);
+        return GetButtonStatus(btn, STATUS_RELEASED);
     }
 
     public bool IsButtonClicked(string btn) {
-        return GetButtonStatus(btn, CLICKED);
+        return GetButtonStatus(btn, STATUS_CLICKED);
     }
 
     IEnumerator ToggleClick(BluetoothButton btn) {
@@ -118,7 +118,7 @@ public class BluetoothService : MonoBehaviour
         }
     }
 
-    void Message(string message) {
+    void OnMessage(string message) {
         Debug.Log("Message:" + message);
         foreach (BluetoothButton btn in buttons) {
             if (message == btn.pressed_name) {

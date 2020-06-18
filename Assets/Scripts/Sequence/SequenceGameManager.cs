@@ -19,7 +19,7 @@ public class SequenceGameManager : MonoBehaviour
     private int score = 0;
     private int bonus = 0;
     private int globalScore;
-    private BluetoothService bt;
+    private BluetoothControl btControl;
     private int x, y;
     private int columns = 2;
     private int rows = 2;
@@ -28,7 +28,7 @@ public class SequenceGameManager : MonoBehaviour
     {
         if (Application.platform == RuntimePlatform.Android) {
             ToggleButton(buttons[0]);
-            bt = BluetoothService.Instance;
+            btControl = BluetoothControl.Instance;
             x = y = 0;
         }
         
@@ -46,12 +46,12 @@ public class SequenceGameManager : MonoBehaviour
     void Update()
     {
         if (Application.platform == RuntimePlatform.Android) {
-            if (bt.IsButtonClicked("Left")) Move("left");
-            if (bt.IsButtonClicked("Right")) Move("right");
-            if (bt.IsButtonClicked("Down")) Move("down");
-            if (bt.IsButtonClicked("Up")) Move("up");
+            if (btControl.IsButtonClicked("Left")) Move("left");
+            if (btControl.IsButtonClicked("Right")) Move("right");
+            if (btControl.IsButtonClicked("Down")) Move("down");
+            if (btControl.IsButtonClicked("Up")) Move("up");
             
-            if (bt.IsButtonClicked("A")) {
+            if (btControl.IsButtonClicked("A")) {
                 if (menu.activeSelf) {
                     Again();
                 } else {
@@ -59,7 +59,7 @@ public class SequenceGameManager : MonoBehaviour
                 }
             }
 
-            if (bt.IsButtonClicked("B")) {
+            if (btControl.IsButtonClicked("B")) {
                 if (menu.activeSelf) {
                     ReturnSpace();
                 } else {

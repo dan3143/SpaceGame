@@ -6,16 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class CardGameManager : MonoBehaviour
 {
+    
     const float offsetX = 3f;
     const float offsetY = 3f;
     private int score = 0;
+    private int revealed_cards = 0;
     private int globalScore;
-    private Card[,] cards;
     private int current_x;
     private int current_y;
+    private Card[,] cards;
     private Card firstRevealed;
     private Card secondRevealed;
-    private BluetoothService bt;
+    private BluetoothControl btControl;
     private bool finished = false;
     [SerializeField] int rows = 3;
     [SerializeField] int columns = 4;
@@ -28,8 +30,8 @@ public class CardGameManager : MonoBehaviour
     void Awake() 
     {
         if (Application.platform == RuntimePlatform.Android) {
-            bt = BluetoothService.Instance;
-            BluetoothService.Bluetooth.ServerObject = "GameManager";
+            btControl = BluetoothControl.Instance;
+            BluetoothControl.Server.ServerObject = this.gameObject.name;
         }
         globalScore = SaveStatus.Load();
         cards = new Card[rows, columns];
@@ -56,9 +58,10 @@ public class CardGameManager : MonoBehaviour
     private IEnumerator CheckMatch() 
     {
         if (firstRevealed.id == secondRevealed.id) {
-            score++;
+            score+=2;
+            revealed_cards++;
             scoreTxt.text = "SCORE: " + score;
-            if (score == images.Length) {
+            if (revealed_cards == images.Length) {
                 globalScore += score;
                 Debug.Log("Points Obtained:" + globalScore);
                 SaveStatus.Save(globalScore);
@@ -157,11 +160,11 @@ public class CardGameManager : MonoBehaviour
                 }
             }
         } else if (Application.platform == RuntimePlatform.Android) {
-            if (bt.IsButtonClicked("Left")) Move("left");
-            if (bt.IsButtonClicked("Right")) Move("right");
-            if (bt.IsButtonClicked("Down")) Move("down");
-            if (bt.IsButtonClicked("Up")) Move("up");
-            if (bt.IsButtonClicked("A")) {
+            if (btControl.IsButtonClicked("Left")) Move("left");
+            if (btControl.IsButtonClicked("Right")) Move("right");
+            if (btControl.IsButtonClicked("Down")) Move("down");
+            if (btControl.IsButtonClicked("Up")) Move("up");
+            if (btControl.IsButtonClicked("A")) {
                 if (finished) {
                     ReturnToMenu();
                 } else {

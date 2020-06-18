@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float maxMovementSpeed = 10f;
     [SerializeField] float deceleration = 0.5f;
     Rigidbody2D rb2;
-    BluetoothService bluetoothService;
+    BluetoothControl btControl;
     bool rotatingRight = false;
     bool rotatingLeft = false;
     bool advancing = false;
@@ -19,15 +19,15 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb2 = GetComponent<Rigidbody2D>();
-        bluetoothService = BluetoothService.Instance;
+        btControl = BluetoothControl.Instance;
     }
     
     void Update()
     {
         if (Application.platform == RuntimePlatform.Android) {
-            rotatingLeft = bluetoothService.IsButtonPressed("Left");
-            rotatingRight = bluetoothService.IsButtonPressed("Right");
-            advancing = bluetoothService.IsButtonPressed("Space");
+            rotatingLeft = btControl.IsButtonPressed("Left");
+            rotatingRight = btControl.IsButtonPressed("Right");
+            advancing = btControl.IsButtonPressed("Space");
         } else {
             rotatingLeft = Input.GetButton("Left");
             rotatingRight = Input.GetButton("Right");
@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Message(string message)
+    void OnMessage(string message)
     {
         rotatingLeft = message == "left_pressed";
         rotatingRight = message == "right_pressed";

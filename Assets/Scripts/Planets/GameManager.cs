@@ -5,12 +5,10 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    Light2D btLight;
-    [SerializeField]
-    TextMeshProUGUI scoreTxt;
+    [SerializeField] Light2D btLight;
+    [SerializeField] TextMeshProUGUI scoreTxt;
     int score;
-    BluetoothService btService;
+    BluetoothControl btService;
 
     void Awake()
     {
@@ -20,32 +18,35 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         if (Application.platform == RuntimePlatform.Android) {
-            BluetoothService.Bluetooth.ServerObject = "GameManager";
+            BluetoothControl.Server.ServerObject = this.gameObject.name;
         }
         btLight.enabled = false;
         scoreTxt.text = "x" + score;
+        if (!Bluetooth.IsEnabled) {
+            BluetoothControl.Server.RequestEnableBluetooth();
+        }
     }
 
     void Update()
     {
         scoreTxt.text = "x" + score;
-        if (Application.platform == RuntimePlatform.Android)
-            btLight.enabled = BluetoothService.Bluetooth.IsEnabled;
-        
+        if (Application.platform == RuntimePlatform.Android){
+            btLight.enabled = Bluetooth.IsEnabled;
+        }
     }
 
-    void Message(string message)
+    void OnMessage(string message)
     {  
         Debug.Log("Server: " + message); 
         if (message == "bluetooth.connected") {
             btLight.color = Color.blue;
         }
         if (message == "bluetooth.on") {
-            BluetoothService.Bluetooth.Start();
+            BluetoothControl.Server.Start();
         } 
         if (message == "server.listening") {
             btLight.color = Color.white;
-        } 
+        }
     }
 
     public void GoToMemoryPlanet()

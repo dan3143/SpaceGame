@@ -13,13 +13,13 @@ public class Planet : MonoBehaviour
     [SerializeField]
     EventTrigger.TriggerEvent planetClick;
     bool selected = false;
-    BluetoothService bluetoothService;
+    BluetoothControl btControl;
 
     void Start()
     {
         if (Application.platform == RuntimePlatform.Android)
-            bluetoothService = GameObject.FindGameObjectWithTag("Bluetooth").GetComponent<BluetoothService>();
-        light2d.enabled = false;
+            btControl = BluetoothControl.Instance;
+        light2d.enabled = false;        
     }
 
     public void Update()
@@ -28,7 +28,7 @@ public class Planet : MonoBehaviour
         {
             bool click = false;
             if (Application.platform == RuntimePlatform.Android) {
-                click = bluetoothService.IsButtonClicked("A");
+                click = btControl.IsButtonClicked("A");
             } else {
                 click = Input.GetButton("A");
             }

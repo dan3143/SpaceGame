@@ -1,66 +1,134 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
+public struct BluetoothDevice {
+    public string name;
+    public string address;
+    public BluetoothDevice(string n, string a)
+    {
+        name = n;
+        address = a;
+    }
+}
 
-public class Bluetooth {
-    const string pluginName = "com.example.bluetooth.BluetoothService";
-    private static AndroidJavaClass _pluginClass;
-    private static AndroidJavaObject _pluginInstance;
+public abstract class Bluetooth {
+    public const string COULD_NOT_READ = "socket.error.COULD_NOT_READ";
+    public const string COULD_NOT_WRITE = "socket.error.COULD_NOT_WRITE";
+    public const string SOCKET_CONNECTED = "socket.connected";
+    public const string MODE_DISCOVERABLE = "bluetooth.mode.discoverable";
+    public const string MODE_CONNECTABLE = "bluetooth.mode.connectable";
+    public const string MODE_NONE = "bluetooth.mode.none";
+    public const string ON = "bluetooth.on";
+    public const string OFF = "bluetooth.off";
+    protected string className = "com.guevara.bluetooth.BluetoothService";
+    private const string btServiceClass = "com.guevara.bluetooth.BluetoothService";
+    private static AndroidJavaClass _serviceClass;
+    private AndroidJavaClass _class;
+    private AndroidJavaObject _instance;
     
-    public static AndroidJavaClass PluginClass {
+    public List<BluetoothDevice> foundDevices;
+    
+    protected AndroidJavaClass PluginClass {
         get {
-            if (_pluginClass == null){
-                _pluginClass = new AndroidJavaClass(pluginName);
+            if (_class == null){
+                _class = new AndroidJavaClass(className);
             }
-            return _pluginClass;
+            return _class;
         }
     }
 
-    public static AndroidJavaObject PluginInstance {
+    protected AndroidJavaObject PluginInstance {
         get {
-            if (_pluginInstance == null){
-                _pluginInstance = PluginClass.CallStatic<AndroidJavaObject>("getInstance");
+            if (_instance == null){
+                _instance = new AndroidJavaObject(className);
             }
-            return _pluginInstance;
+            return _instance;
         }
     }
 
-    public void Start(){
-        Debug.Log("Starting Bluetooth server...");
-        PluginInstance.Call("start");
-    }
-
-    public void Stop(){
-        PluginInstance.Call("stop");
-    }
-
-    public bool Enable() {
-        return PluginInstance.Call<bool>("enable");
-    }
-
-    public bool Disable() {
-        return PluginInstance.Call<bool>("disable");
-    }
-
-    public bool IsEnabled {
+    private static AndroidJavaClass ServiceClass {
         get {
-            return PluginInstance.Call<bool>("isEnabled");
+            if (_serviceClass == null) {
+                _serviceClass = new AndroidJavaClass("com.guevara.bluetooth.BluetoothService");
+            }
+            return _serviceClass;
         }
+    }
+
+    public static void SearchDevices() 
+    {
+        ServiceClass.CallStatic("searchDevices");
+    }
+
+    public static string GetSerialUUID() 
+    {
+        return ServiceClass.CallStatic<string>("getSerialUUID");
+    }
+
+    public static BluetoothDevice GetDevice(string address) 
+    {
+        return new BluetoothDevice(ServiceClass.CallStatic<string>("getDeviceName", address), address);    
+    }
+
+    private static List<BluetoothDevice> GetDevices(int type) {
+        AndroidJavaObject array;
+        if (type == 0) {
+            array = ServiceClass.CallStatic<AndroidJavaObject>("u_getBondedDevices");
+        } else {
+            array = ServiceClass.CallStatic<AndroidJavaObject>("u_getDiscoveredDevices");
+        }
+        List<BluetoothDevice> bondedDevices = new List<BluetoothDevice>();
+        if (array.GetRawObject().ToInt32() != 0) {
+            string[] devices = AndroidJNIHelper.ConvertFromJNIArray<string[]>(array.GetRawObject());
+            foreach(string device in devices) {
+                string[] tokens = device.Split(',');
+                BluetoothDevice dev;
+                dev.address = tokens[0];
+                dev.name = tokens[1];
+                bondedDevices.Add(dev);
+            }
+        }
+        return bondedDevices;
+    }
+
+    public static List<BluetoothDevice> GetBondedDevices() {
+        return GetDevices(0);
+    }
+
+    public static List<BluetoothDevice> GetDiscoveredDevices() {
+        return GetDevices(1);
+    }
+
+    public static bool IsEnabled {
+        get {
+            return ServiceClass.CallStatic<bool>("isEnabled");
+        }
+    }
+
+    public void RequestEnableBluetooth() {
+        PluginInstance.Call("requestEnableBluetooth");
+    }
+
+    public void RequestEnableDiscoverability() {
+        PluginInstance.Call("requestEnableDiscoverability");
     }
 
     public string PlayerObject {
         set {
-            PluginClass.CallStatic("setGameObject", value);    
+            PluginInstance.Call("setGameObject", value);    
         }
         get {
-            return PluginClass.CallStatic<string>("getGameObject");    
+            return PluginInstance.Call<string>("getGameObject");    
         }
     }
+
     public string ServerObject {
         set {
-            PluginClass.CallStatic("setServerObject", value);    
+            PluginInstance.Call("setServerObject", value);    
         }
         get {
-            return PluginClass.CallStatic<string>("getServerObject");    
+            return PluginInstance.Call<string>("getServerObject");    
         }
     }
 
